@@ -49,51 +49,37 @@ export class ApiFrameworkService {
 	async readAll(
 	query: Record<string, string | string[] | undefined>,
 ) {
+	const filter = this.buildFrameworkFilter(query);
 
-	const where = this.buildWhere(query);
+	const skip = (filter.page - 1) * filter.pageSize;
 
-	const orderBy = this.buildOrderBy(query);
+	const take = filter.pageSize;
 
-	const { skip, take, page, pageSize } =
-		this.buildPagination(query);
+	const where = this.buildWhere(filter);
 
-	const [data, total] =
-		await Promise.all([
+	const orderBy = this.buildOrderBy(filter);
 
-			this.prismaService.framework.findMany({
+	
 
-				where,
-
-				include,
-
-				orderBy,
-
-				skip,
-
-				take,
-
-			}),
-
-			this.prismaService.framework.count({
-
-				where,
-
-			}),
-
-		]);
+	const [frameworks, total] = await Promise.all([
+		this.prismaService.framework.findMany({
+			where,
+			include,
+			orderBy,
+			skip,
+			take,
+		}),
+		this.prismaService.framework.count({
+			where,
+		}),
+	]);
 
 	return {
-
-		data,
-
+		data: frameworks,
 		total,
-
-		page,
-
-		pageSize,
-
+		page: filter.page,
+		pageSize: filter.pageSize,
 	};
-
 }
 
 	update(id: Framework["id"], data: UpdateFrameworkDTO) {
@@ -155,31 +141,13 @@ private buildPagination(
 }
 
 private buildOrderBy(
-	query: Record<string, string | string[] | undefined>,
+	filter: FrameworkFilter,
 ): Prisma.FrameworkOrderByWithRelationInput {
 
-	const sort = Array.isArray(query['sort'])
-		? query['sort'][0]
-		: query['sort'];
-
-	const order = Array.isArray(query['order'])
-		? query['order'][0]
-		: query['order'];
-
-	if (
-		!sort ||
-		!this.sortableFields.includes(
-			sort as (typeof this.sortableFields)[number],
-		)
-	) {
-		return {
-			name: "asc",
-		};
-	}
-
 	return {
-		[sort]: order === "desc" ? "desc" : "asc",
+		[filter.sort]: filter.order,
 	};
+
 }
 
 private frameworkFilter(
@@ -472,6 +440,39 @@ private createdAtFilter(
 	return {
 		gte: start,
 		lte: end,
+	};
+}
+
+private buildFrameworkFilter(
+	query: Record<string, string | string[] | undefined>,
+): FrameworkFilter {
+
+	const page = this.pageFilter(query);
+
+	const pageSize = this.pageSizeFilter(query);
+
+	return {
+
+		page,
+
+		pageSize,
+
+		sort: this.sortFilter(query),
+
+		order: this.orderFilter(query),
+
+		name: this.nameFilter(query),
+
+		frameworkTypeIds: this.frameworkTypeFilter(query),
+
+		codingLanguageIds: this.codingLanguageFilter(query),
+
+		releasedAt: this.releasedAtFilter(query),
+
+		createdAt: this.createdAtFilter(query),
+
+		updatedAt: this.updatedAtFilter(query),
+
 	};
 }
 }

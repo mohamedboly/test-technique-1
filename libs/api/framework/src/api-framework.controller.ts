@@ -16,8 +16,10 @@ export class ApiFrameworkController {
 	@Get()
 	readAll(
 		@Query()
-		query: Record<string, string | string[] | undefined>,
+		query: Record<string, string | string[] | undefined>
 	) {
+		console.log("aa");
+		console.log(query["name"]);
 		return this.apiFrameworkService.readAll(query);
 	}
 	@Get(":id")
@@ -31,10 +33,7 @@ export class ApiFrameworkController {
 	}
 
 	@Patch(":id")
-	update(
-		@Param("id", ParseIntPipe) id: Framework["id"],
-		@Body() updateFrameworkDTO: UpdateFrameworkDTO
-	) {
+	update(@Param("id", ParseIntPipe) id: Framework["id"], @Body() updateFrameworkDTO: UpdateFrameworkDTO) {
 		return this.apiFrameworkService.update(id, updateFrameworkDTO);
 	}
 
@@ -43,4 +42,3 @@ export class ApiFrameworkController {
 		return this.apiFrameworkService.delete(id);
 	}
 }
-
