@@ -8,7 +8,7 @@ import { FormsModule } from "@angular/forms";
 	imports: [CommonModule, FormsModule],
 	template: `
 		<div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-			<label class="mb-2 block text-sm font-medium text-slate-700"> Nom </label>
+			<label class="mb-2 block text-sm font-medium text-slate-700"> Name </label>
 
 			<input
 				type="text"

@@ -18,8 +18,6 @@ export class ApiFrameworkController {
 		@Query()
 		query: Record<string, string | string[] | undefined>
 	) {
-		console.log("aa");
-		console.log(query["name"]);
 		return this.apiFrameworkService.readAll(query);
 	}
 	@Get(":id")
