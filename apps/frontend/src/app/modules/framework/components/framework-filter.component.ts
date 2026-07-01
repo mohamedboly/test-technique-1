@@ -1,6 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { FormsModule } from "@angular/forms";
+import { ReadOneCodingLanguage } from "@nx-nestjs-angular-starter/api/coding-language";
 import { ReadOneFrameworkType } from "@nx-nestjs-angular-starter/api/framework-type";
 
 @Component({
@@ -8,7 +9,91 @@ import { ReadOneFrameworkType } from "@nx-nestjs-angular-starter/api/framework-t
 	standalone: true,
 	imports: [CommonModule, FormsModule],
 	template: `
-		<div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+		<div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+			<div class="mb-6 flex items-center justify-between border-b pb-3">
+				<h2 class="text-lg font-semibold">Filters</h2>
+
+				<!-- <button type="button" class="text-sm text-blue-600 hover:underline" (click)="clearFilters()">
+					Clear
+				</button> -->
+			</div>
+
+			<!-- Name -->
+
+			<div class="mb-6">
+				<label for="name" class="mb-2 block text-sm font-medium"> Name </label>
+
+				<input
+					id="name"
+					type="text"
+					class="w-full rounded-md border border-slate-300 px-3 py-2"
+					[ngModel]="name"
+					(ngModelChange)="onNameChange($event)"
+					placeholder="Search..."
+				/>
+			</div>
+
+			<!-- Framework Type -->
+
+			<div class="mb-6">
+				<h3 class="mb-3 font-semibold">Framework Type</h3>
+
+				@for (type of frameworkTypes; track type.id) {
+					<label class="mb-2 flex cursor-pointer items-center gap-2">
+						<input
+							type="checkbox"
+							[checked]="selectedFrameworkTypeIds.includes(type.id)"
+							(change)="onFrameworkTypeChecked(type.id, $any($event.target).checked)"
+						/>
+
+						<span>{{ type.name }}</span>
+					</label>
+				}
+			</div>
+
+			<!-- Coding Language -->
+
+			<div class="mb-6">
+				<h3 class="mb-3 font-semibold">Coding Language</h3>
+
+				@for (language of codingLanguages; track language.id) {
+					<label class="mb-2 flex cursor-pointer items-center gap-2">
+						<input
+							type="checkbox"
+							[checked]="selectedCodingLanguageIds.includes(language.id)"
+							(change)="onCodingLanguageChecked(language.id, $any($event.target).checked)"
+						/>
+
+						<span>{{ language.name }}</span>
+					</label>
+				}
+			</div>
+
+			<!-- Released -->
+
+			<div class="mb-6">
+				<label for="releasedAt" class="mb-2 block font-semibold"> Released At </label>
+
+				<input id="releasedAt" type="date" class="w-full rounded-md border border-slate-300 px-3 py-2" />
+			</div>
+
+			<!-- Created -->
+
+			<div class="mb-6">
+				<label for="createdAt" class="mb-2 block font-semibold"> Created At </label>
+
+				<input id="createdAt" type="date" class="w-full rounded-md border border-slate-300 px-3 py-2" />
+			</div>
+
+			<!-- Updated -->
+
+			<div>
+				<label for="updatedAt" class="mb-2 block font-semibold"> Updated At </label>
+
+				<input id="updatedAt" type="date" class="w-full rounded-md border border-slate-300 px-3 py-2" />
+			</div>
+		</div>
+		<!-- <div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
 			<label class="mb-2 block text-sm font-medium text-slate-700"> Name </label>
 
 			<input
@@ -35,7 +120,7 @@ import { ReadOneFrameworkType } from "@nx-nestjs-angular-starter/api/framework-t
 					</div>
 				}
 			</div>
-		</div>
+		</div> -->
 	`,
 })
 export class FrameworkFilterComponent {
@@ -54,6 +139,15 @@ export class FrameworkFilterComponent {
 	@Output()
 	frameworkTypeChange = new EventEmitter<number[]>();
 
+	@Input()
+	codingLanguages: ReadOneCodingLanguage[] = [];
+
+	@Input()
+	selectedCodingLanguageIds: number[] = [];
+
+	@Output()
+	codingLanguageChange = new EventEmitter<number[]>();
+
 	onNameChange(value: string) {
 		this.nameChange.emit(value);
 	}
@@ -70,5 +164,19 @@ export class FrameworkFilterComponent {
 		}
 
 		this.frameworkTypeChange.emit(ids);
+	}
+
+	onCodingLanguageChecked(id: number, checked: boolean) {
+		let ids = [...this.selectedCodingLanguageIds];
+
+		if (checked) {
+			if (!ids.includes(id)) {
+				ids.push(id);
+			}
+		} else {
+			ids = ids.filter(value => value !== id);
+		}
+
+		this.codingLanguageChange.emit(ids);
 	}
 }

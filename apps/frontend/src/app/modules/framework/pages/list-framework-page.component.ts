@@ -26,6 +26,9 @@ import { FrameworkFilterComponent } from "../components/framework-filter.compone
 					[frameworkTypes]="(frameworkTypes$ | async) ?? []"
 					[selectedFrameworkTypeIds]="(frameworkTypeIds$ | async) ?? []"
 					(frameworkTypeChange)="onFrameworkTypeChange($event)"
+					[codingLanguages]="(codingLanguages$ | async) ?? []"
+					[selectedCodingLanguageIds]="(codingLanguageIds$ | async) ?? []"
+					(codingLanguageChange)="onCodingLanguageChange($event)"
 				/>
 			</div>
 
@@ -79,6 +82,9 @@ export class ListFrameworkPageComponent {
 	readonly frameworkTypeIds$ = this.route.queryParamMap.pipe(
 		map(params => params.getAll("frameworkTypeId").map(Number))
 	);
+	readonly codingLanguageIds$ = this.route.queryParamMap.pipe(
+		map(params => params.getAll("codingLanguageId").map(Number))
+	);
 
 	constructor(
 		private frameworkService: FrameworkService,
@@ -109,6 +115,20 @@ export class ListFrameworkPageComponent {
 
 			queryParams: {
 				frameworkTypeId: ids.length ? ids : null,
+
+				page: 1,
+			},
+
+			queryParamsHandling: "merge",
+		});
+	}
+
+	onCodingLanguageChange(ids: number[]) {
+		this.router.navigate([], {
+			relativeTo: this.route,
+
+			queryParams: {
+				codingLanguageId: ids.length ? ids : null,
 
 				page: 1,
 			},
