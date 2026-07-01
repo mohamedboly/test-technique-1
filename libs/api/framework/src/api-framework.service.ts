@@ -24,12 +24,7 @@ export class ApiFrameworkService {
 		this.logger.setContext(ApiFrameworkService.name);
 	}
 
-	private readonly sortableFields = [
-	"name",
-	"releasedAt",
-	"createdAt",
-	"updatedAt",
-] as const;
+	private readonly sortableFields = ["name", "releasedAt", "createdAt", "updatedAt"] as const;
 
 	create(data: CreateFrameworkDTO) {
 		return this.prismaService.framework.create({ data, include });
@@ -46,41 +41,37 @@ export class ApiFrameworkService {
 	// 	return this.prismaService.framework.findMany({ where, include });
 	// }
 
-	async readAll(
-	query: Record<string, string | string[] | undefined>,
-) {
-	const filter = this.buildFrameworkFilter(query);
+	async readAll(query: Record<string, string | string[] | undefined>) {
+		const filter = this.buildFrameworkFilter(query);
 
-	const skip = (filter.page - 1) * filter.pageSize;
+		const skip = (filter.page - 1) * filter.pageSize;
 
-	const take = filter.pageSize;
+		const take = filter.pageSize;
 
-	const where = this.buildWhere(filter);
+		const where = this.buildWhere(filter);
 
-	const orderBy = this.buildOrderBy(filter);
+		const orderBy = this.buildOrderBy(filter);
 
-	
+		const [frameworks, total] = await Promise.all([
+			this.prismaService.framework.findMany({
+				where,
+				include,
+				orderBy,
+				skip,
+				take,
+			}),
+			this.prismaService.framework.count({
+				where,
+			}),
+		]);
 
-	const [frameworks, total] = await Promise.all([
-		this.prismaService.framework.findMany({
-			where,
-			include,
-			orderBy,
-			skip,
-			take,
-		}),
-		this.prismaService.framework.count({
-			where,
-		}),
-	]);
-
-	return {
-		data: frameworks,
-		total,
-		page: filter.page,
-		pageSize: filter.pageSize,
-	};
-}
+		return {
+			data: frameworks,
+			total,
+			page: filter.page,
+			pageSize: filter.pageSize,
+		};
+	}
 
 	update(id: Framework["id"], data: UpdateFrameworkDTO) {
 		return this.prismaService.framework.update({
@@ -98,405 +89,252 @@ export class ApiFrameworkService {
 		});
 	}
 
-	private toNumber(
-	value: string | string[] | undefined,
-	defaultValue: number,
-): number {
+	private toNumber(value: string | string[] | undefined, defaultValue: number): number {
+		if (Array.isArray(value)) {
+			value = value[0];
+		}
 
-	if (Array.isArray(value)) {
-		value = value[0];
+		const number = Number(value);
+
+		return Number.isNaN(number) ? defaultValue : number;
 	}
 
-	const number = Number(value);
+	private buildPagination(query: Record<string, string | string[] | undefined>) {
+		const page = Math.max(1, this.toNumber(query["page"], 1));
 
-	return Number.isNaN(number) ? defaultValue : number;
-}
+		const pageSize = Math.max(1, this.toNumber(query["pageSize"], 12));
 
-private buildPagination(
-	query: Record<string, string | string[] | undefined>,
-) {
+		return {
+			page,
 
-	const page = Math.max(
-		1,
-		this.toNumber(query['page'], 1),
-	);
+			pageSize,
 
-	const pageSize = Math.max(
-		1,
-		this.toNumber(query['pageSize'], 12),
-	);
+			skip: (page - 1) * pageSize,
 
-	return {
-
-		page,
-
-		pageSize,
-
-		skip: (page - 1) * pageSize,
-
-		take: pageSize,
-
-	};
-
-}
-
-private buildOrderBy(
-	filter: FrameworkFilter,
-): Prisma.FrameworkOrderByWithRelationInput {
-
-	return {
-		[filter.sort]: filter.order,
-	};
-
-}
-
-private frameworkFilter(
-    query: Record<string, string | string[] | undefined>,
-): FrameworkFilter {
-
-    return {
-
-        page: this.pageFilter(query),
-
-        pageSize: this.pageSizeFilter(query),
-
-        sort: this.sortFilter(query),
-
-        order: this.orderFilter(query),
-
-        name: this.nameFilter(query),
-
-        frameworkTypeIds: this.frameworkTypeFilter(query),
-
-        codingLanguageIds: this.codingLanguageFilter(query),
-
-        releasedAt: this.releasedAtFilter(query),
-
-        createdAt: this.createdAtFilter(query),
-
-        updatedAt: this.updatedAtFilter(query),
-
-    };
-
-}	
-
-	private buildWhere(
-    filter: FrameworkFilter,
-): Prisma.FrameworkWhereInput {
-
-    const where: Prisma.FrameworkWhereInput = {
-        deletedAt: null,
-    };
-
-    if (filter.name) {
-
-        where.name = {
-            contains: filter.name,
-        
-        };
-
-    }
-
-    if (filter.frameworkTypeIds) {
-
-        where.frameworkTypeId = {
-            in: filter.frameworkTypeIds,
-        };
-
-    }
-
-    if (filter.codingLanguageIds) {
-
-        where.codingLanguageId = {
-            in: filter.codingLanguageIds,
-        };
-
-    }
-
-    if (filter.releasedAt) {
-
-        where.releasedAt = filter.releasedAt;
-
-    }
-
-    if (filter.createdAt) {
-
-        where.createdAt = filter.createdAt;
-
-    }
-
-    if (filter.updatedAt) {
-
-        where.updatedAt = filter.updatedAt;
-
-    }
-
-    return where;
-
-}
-
-private nameFilter(
-	query: Record<string, string | string[] | undefined>,
-): string | null {
-
-	if (!query['name'] || typeof query['name'] !== "string") {
-		return null;
+			take: pageSize,
+		};
 	}
 
-	return query['name'].trim() || null;
-}
-
-private frameworkTypeFilter(
-	query: Record<string, string | string[] | undefined>,
-): number[] | null {
-
-	const value = query['frameworkTypeId'];
-
-	if (!value) {
-		return null;
+	private buildOrderBy(filter: FrameworkFilter): Prisma.FrameworkOrderByWithRelationInput {
+		return {
+			[filter.sort]: filter.order,
+		};
 	}
 
-	const values = Array.isArray(value)
-		? value
-		: [value];
+	private frameworkFilter(query: Record<string, string | string[] | undefined>): FrameworkFilter {
+		return {
+			page: this.pageFilter(query),
 
-	const ids = values
-		.map(Number)
-		.filter((id) => !Number.isNaN(id));
+			pageSize: this.pageSizeFilter(query),
 
-	return ids.length ? ids : null;
-}
+			sort: this.sortFilter(query),
 
-private codingLanguageFilter(
-	query: Record<string, string | string[] | undefined>,
-): number[] | null {
+			order: this.orderFilter(query),
 
-	const value = query['codingLanguageId'];
+			name: this.nameFilter(query),
 
-	if (!value) {
-		return null;
+			frameworkTypeIds: this.frameworkTypeFilter(query),
+
+			codingLanguageIds: this.codingLanguageFilter(query),
+
+			releasedAt: this.releasedAtFilter(query),
+
+			createdAt: this.createdAtFilter(query),
+
+			updatedAt: this.updatedAtFilter(query),
+		};
 	}
 
-	const values = Array.isArray(value)
-		? value
-		: [value];
+	private buildWhere(filter: FrameworkFilter): Prisma.FrameworkWhereInput {
+		const where: Prisma.FrameworkWhereInput = {
+			deletedAt: null,
+		};
 
-	const ids = values
-		.map(Number)
-		.filter((id) => !Number.isNaN(id));
+		if (filter.name) {
+			where.name = {
+				contains: filter.name,
+			};
+		}
 
-	return ids.length ? ids : null;
-}
+		if (filter.frameworkTypeIds) {
+			where.frameworkTypeId = {
+				in: filter.frameworkTypeIds,
+			};
+		}
 
-private pageFilter(
-	query: Record<string, string | string[] | undefined>,
-): number {
+		if (filter.codingLanguageIds) {
+			where.codingLanguageId = {
+				in: filter.codingLanguageIds,
+			};
+		}
 
-	const value = query['page'];
+		if (filter.releasedAt) {
+			where.releasedAt = filter.releasedAt;
+		}
 
-	const page = Number( value,
-);
+		if (filter.createdAt) {
+			where.createdAt = filter.createdAt;
+		}
 
-	return Number.isNaN(page) || page < 1
-		? 1
-		: page;
-}
+		if (filter.updatedAt) {
+			where.updatedAt = filter.updatedAt;
+		}
 
-private pageSizeFilter(
-	query: Record<string, string | string[] | undefined>,
-): number {
+		console.log(where);
 
-	const value = query['pageSize'];
-
-	const pageSize = Number(value
-	);
-
-	return Number.isNaN(pageSize) || pageSize < 1
-		? 12
-		: pageSize;
-}
-
-
-
-private sortFilter(
-	query: Record<string, string | string[] | undefined>,
-): Prisma.FrameworkScalarFieldEnum {
-
-	const value = query['sort'];
-
-	if (
-		value &&
-		this.sortableFields.includes(
-			value as (typeof this.sortableFields)[number],
-		)
-	) {
-		return value as Prisma.FrameworkScalarFieldEnum;
+		return where;
 	}
 
-	return Prisma.FrameworkScalarFieldEnum.name;
-}
+	private nameFilter(query: Record<string, string | string[] | undefined>): string | null {
+		if (!query["name"] || typeof query["name"] !== "string") {
+			return null;
+		}
 
-private orderFilter(
-	query: Record<string, string | string[] | undefined>,
-): Prisma.SortOrder {
-
-	const value = 
-		 query['order'];
-
-	return value === "desc"
-		? Prisma.SortOrder.desc
-		: Prisma.SortOrder.asc;
-}
-
-private releasedAtFilter(
-	query: Record<string, string | string[] | undefined>,
-): Prisma.DateTimeFilter | null {
-
-	const value = query['releasedAt'];
-
-	if (!value) {
-		return null;
+		return query["name"].trim() || null;
 	}
 
-	const date = new Date(
-		Array.isArray(value)
-			? value[0]
-			: value,
-	);
+	private frameworkTypeFilter(query: Record<string, string | string[] | undefined>): number[] | null {
+		const value = query["frameworkTypeId"];
 
-	if (Number.isNaN(date.getTime())) {
-		return null;
+		if (!value) {
+			return null;
+		}
+
+		const values = Array.isArray(value) ? value : [value];
+
+		const ids = values.map(Number).filter(id => !Number.isNaN(id));
+
+		return ids.length ? ids : null;
 	}
 
-	const start = new Date(date);
-	start.setHours(0, 0, 0, 0);
+	private codingLanguageFilter(query: Record<string, string | string[] | undefined>): number[] | null {
+		const value = query["codingLanguageId"];
 
-	const end = new Date(date);
-	end.setHours(23, 59, 59, 999);
+		if (!value) {
+			return null;
+		}
 
-	return {
-		gte: start,
-		lte: end,
-	};
-}
-private updatedAtFilter(
-	query: Record<string, string | string[] | undefined>,
-): Prisma.DateTimeFilter | null {
+		const values = Array.isArray(value) ? value : [value];
 
-	const value = query['updatedAt'];
+		const ids = values.map(Number).filter(id => !Number.isNaN(id));
 
-	if (!value) {
-		return null;
+		return ids.length ? ids : null;
 	}
 
-	const date = new Date(
-		Array.isArray(value)
-			? value[0]
-			: value,
-	);
+	private pageFilter(query: Record<string, string | string[] | undefined>): number {
+		const value = query["page"];
 
-	if (Number.isNaN(date.getTime())) {
-		return null;
+		const page = Number(value);
+
+		return Number.isNaN(page) || page < 1 ? 1 : page;
 	}
 
-	const start = new Date(date);
-	start.setHours(0, 0, 0, 0);
+	private pageSizeFilter(query: Record<string, string | string[] | undefined>): number {
+		const value = query["pageSize"];
 
-	const end = new Date(date);
-	end.setHours(23, 59, 59, 999);
+		const pageSize = Number(value);
 
-	return {
-		gte: start,
-		lte: end,
-	};
-}
-
-private createdAtFilter(
-	query: Record<string, string | string[] | undefined>,
-): Prisma.DateTimeFilter | null {
-
-	const value = query['createdAt'];
-
-	if (!value) {
-		return null;
+		return Number.isNaN(pageSize) || pageSize < 1 ? 12 : pageSize;
 	}
 
-	const date = new Date(
-		Array.isArray(value)
-			? value[0]
-			: value,
-	);
+	private sortFilter(query: Record<string, string | string[] | undefined>): Prisma.FrameworkScalarFieldEnum {
+		const value = query["sort"];
 
-	if (Number.isNaN(date.getTime())) {
-		return null;
+		if (value && this.sortableFields.includes(value as (typeof this.sortableFields)[number])) {
+			return value as Prisma.FrameworkScalarFieldEnum;
+		}
+
+		return Prisma.FrameworkScalarFieldEnum.name;
 	}
 
-	const start = new Date(date);
-	start.setHours(0, 0, 0, 0);
+	private orderFilter(query: Record<string, string | string[] | undefined>): Prisma.SortOrder {
+		const value = query["order"];
 
-	const end = new Date(date);
-	end.setHours(23, 59, 59, 999);
+		return value === "desc" ? Prisma.SortOrder.desc : Prisma.SortOrder.asc;
+	}
 
-	return {
-		gte: start,
-		lte: end,
-	};
-}
+	private releasedAtFilter(query: Record<string, string | string[] | undefined>) {
+		return this.buildDateFilter(query["releasedAt"]);
+	}
 
-private buildFrameworkFilter(
-	query: Record<string, string | string[] | undefined>,
-): FrameworkFilter {
+	private createdAtFilter(query: Record<string, string | string[] | undefined>) {
+		return this.buildDateFilter(query["createdAt"]);
+	}
 
-	const page = this.pageFilter(query);
+	private updatedAtFilter(query: Record<string, string | string[] | undefined>) {
+		return this.buildDateFilter(query["updatedAt"]);
+	}
 
-	const pageSize = this.pageSizeFilter(query);
+	private buildDateFilter(value: string | string[] | undefined): Prisma.DateTimeFilter | null {
+		if (!value) {
+			return null;
+		}
 
-	return {
+		const date = Array.isArray(value) ? value[0] : value;
 
-		page,
+		const [year, month, day] = date.split("-").map(Number);
 
-		pageSize,
+		if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day)) {
+			return null;
+		}
 
-		sort: this.sortFilter(query),
+		const start = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
 
-		order: this.orderFilter(query),
+		const end = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
 
-		name: this.nameFilter(query),
+		return {
+			gte: start,
+			lte: end,
+		};
+	}
 
-		frameworkTypeIds: this.frameworkTypeFilter(query),
+	private buildFrameworkFilter(query: Record<string, string | string[] | undefined>): FrameworkFilter {
+		const page = this.pageFilter(query);
 
-		codingLanguageIds: this.codingLanguageFilter(query),
+		const pageSize = this.pageSizeFilter(query);
 
-		releasedAt: this.releasedAtFilter(query),
+		return {
+			page,
 
-		createdAt: this.createdAtFilter(query),
+			pageSize,
 
-		updatedAt: this.updatedAtFilter(query),
+			sort: this.sortFilter(query),
 
-	};
-}
+			order: this.orderFilter(query),
+
+			name: this.nameFilter(query),
+
+			frameworkTypeIds: this.frameworkTypeFilter(query),
+
+			codingLanguageIds: this.codingLanguageFilter(query),
+
+			releasedAt: this.releasedAtFilter(query),
+
+			createdAt: this.createdAtFilter(query),
+
+			updatedAt: this.updatedAtFilter(query),
+		};
+	}
 }
 
 interface FrameworkFilter {
+	page: number;
 
-    page: number;
+	pageSize: number;
 
-    pageSize: number;
+	sort: Prisma.FrameworkScalarFieldEnum;
 
-    sort: Prisma.FrameworkScalarFieldEnum;
+	order: Prisma.SortOrder;
 
-    order: Prisma.SortOrder;
+	name: string | null;
 
-    name: string | null;
+	frameworkTypeIds: number[] | null;
 
-    frameworkTypeIds: number[] | null;
+	codingLanguageIds: number[] | null;
 
-    codingLanguageIds: number[] | null;
+	releasedAt: Prisma.DateTimeFilter | null;
 
-    releasedAt: Prisma.DateTimeFilter | null;
+	createdAt: Prisma.DateTimeFilter | null;
 
-    createdAt: Prisma.DateTimeFilter | null;
-
-    updatedAt: Prisma.DateTimeFilter | null;
-
+	updatedAt: Prisma.DateTimeFilter | null;
 }

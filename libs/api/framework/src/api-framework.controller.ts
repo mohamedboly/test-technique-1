@@ -18,6 +18,7 @@ export class ApiFrameworkController {
 		@Query()
 		query: Record<string, string | string[] | undefined>
 	) {
+		console.log(query);
 		return this.apiFrameworkService.readAll(query);
 	}
 	@Get(":id")
