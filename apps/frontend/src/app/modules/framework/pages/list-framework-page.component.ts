@@ -1,7 +1,12 @@
 import { CommonModule } from "@angular/common";
 import { Component } from "@angular/core";
 import { ActivatedRoute, ParamMap, Router } from "@angular/router";
-import { FrameworkService, TopbarService } from "@nx-nestjs-angular-starter/frontend-shared";
+import {
+	CodingLanguageService,
+	FrameworkService,
+	FrameworkTypeService,
+	TopbarService,
+} from "@nx-nestjs-angular-starter/frontend-shared";
 import { FrameworkFilter } from "libs/frontend/src/models/framework-filter";
 import { map, switchMap, tap } from "rxjs";
 import { FrameworkCardComponent } from "../components/framework-card.component";
@@ -15,7 +20,13 @@ import { FrameworkFilterComponent } from "../components/framework-filter.compone
 		<div class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
 			<!-- Colonne gauche -->
 			<div>
-				<app-framework-filter [name]="(name$ | async) ?? ''" (nameChange)="onNameChange($event)" />
+				<app-framework-filter
+					[name]="(name$ | async) ?? ''"
+					(nameChange)="onNameChange($event)"
+					[frameworkTypes]="(frameworkTypes$ | async) ?? []"
+					[selectedFrameworkTypeIds]="(frameworkTypeIds$ | async) ?? []"
+					(frameworkTypeChange)="onFrameworkTypeChange($event)"
+				/>
 			</div>
 
 			<div class="flex flex-col gap-4">
@@ -48,6 +59,10 @@ export class ListFrameworkPageComponent {
 	// );
 	// loading = true;
 
+	frameworkTypes$ = this.frameworkTypeService.readAll();
+
+	codingLanguages$ = this.codingLanguageService.readAll();
+
 	queryParams$ = this.route.queryParamMap;
 
 	frameworks$ = this.queryParams$.pipe(
@@ -61,9 +76,14 @@ export class ListFrameworkPageComponent {
 	loading = true;
 
 	readonly name$ = this.route.queryParamMap.pipe(map(params => params.get("name") ?? null));
+	readonly frameworkTypeIds$ = this.route.queryParamMap.pipe(
+		map(params => params.getAll("frameworkTypeId").map(Number))
+	);
 
 	constructor(
 		private frameworkService: FrameworkService,
+		private codingLanguageService: CodingLanguageService,
+		private frameworkTypeService: FrameworkTypeService,
 		private topbarService: TopbarService,
 		private route: ActivatedRoute,
 		private router: Router
@@ -79,6 +99,20 @@ export class ListFrameworkPageComponent {
 
 				page: 1,
 			},
+			queryParamsHandling: "merge",
+		});
+	}
+
+	onFrameworkTypeChange(ids: number[]) {
+		this.router.navigate([], {
+			relativeTo: this.route,
+
+			queryParams: {
+				frameworkTypeId: ids.length ? ids : null,
+
+				page: 1,
+			},
+
 			queryParamsHandling: "merge",
 		});
 	}
