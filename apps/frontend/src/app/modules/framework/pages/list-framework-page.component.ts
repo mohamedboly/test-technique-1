@@ -1,7 +1,9 @@
 import { CommonModule } from "@angular/common";
 import { Component } from "@angular/core";
+import { ActivatedRoute, ParamMap, Router } from "@angular/router";
 import { FrameworkService, TopbarService } from "@nx-nestjs-angular-starter/frontend-shared";
-import { tap } from "rxjs";
+import { FrameworkFilter } from "libs/frontend/src/models/framework-filter";
+import { map, switchMap, tap } from "rxjs";
 import { FrameworkCardComponent } from "../components/framework-card.component";
 
 @Component({
@@ -32,15 +34,53 @@ import { FrameworkCardComponent } from "../components/framework-card.component";
 	`,
 })
 export class ListFrameworkPageComponent {
-	frameworks$ = this.frameworkService.readAll().pipe(
-		tap(() => (this.loading = false)),
+	// frameworks$ = this.frameworkService.readAll().pipe(
+	// 	tap(() => (this.loading = false)),
+	// );
+	// loading = true;
+
+	queryParams$ = this.route.queryParamMap;
+
+	frameworks$ = this.queryParams$.pipe(
+		map(query => this.buildFrameworkFilter(query)),
+
+		switchMap(filter => this.frameworkService.readPage(filter)),
+
+		tap(() => (this.loading = false))
 	);
+
 	loading = true;
 
 	constructor(
 		private frameworkService: FrameworkService,
-		private topbarService: TopbarService
+		private topbarService: TopbarService,
+		private route: ActivatedRoute,
+		private router: Router
 	) {
 		this.topbarService.setHeader("Frameworks");
+	}
+
+	private buildFrameworkFilter(query: ParamMap): FrameworkFilter {
+		return {
+			page: Number(query.get("page") ?? 1),
+
+			pageSize: Number(query.get("pageSize") ?? 12),
+
+			sort: (query.get("sort") as FrameworkFilter["sort"]) ?? "name",
+
+			order: query.get("order") === "desc" ? "desc" : "asc",
+
+			name: query.get("name"),
+
+			frameworkTypeIds: query.getAll("frameworkTypeId").map(Number),
+
+			codingLanguageIds: query.getAll("codingLanguageId").map(Number),
+
+			releasedAt: query.get("releasedAt") ? new Date(query.get("releasedAt")!) : null,
+
+			createdAt: query.get("createdAt") ? new Date(query.get("createdAt")!) : null,
+
+			updatedAt: query.get("updatedAt") ? new Date(query.get("updatedAt")!) : null,
+		};
 	}
 }
