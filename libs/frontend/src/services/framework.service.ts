@@ -15,19 +15,14 @@ export class FrameworkService extends BaseService<ReadOneFramework, CreateFramew
 	}
 
 	public readPage(filter: FrameworkFilter) {
-
 		const params = this.buildHttpParams(filter);
 
-		return this.httpClient.get<ReadAllFrameworkResponse>(
-			this.baseUrl,
-			{
-				params,
-			},
-		);
+		return this.httpClient.get<ReadAllFrameworkResponse>(this.baseUrl, {
+			params,
+		});
 	}
 
 	private buildHttpParams(filter: FrameworkFilter): HttpParams {
-
 		let params = new HttpParams()
 			.set("page", filter.page)
 			.set("pageSize", filter.pageSize)
@@ -47,35 +42,19 @@ export class FrameworkService extends BaseService<ReadOneFramework, CreateFramew
 		});
 
 		if (filter.releasedAt) {
-			params = params.set(
-				"releasedAt",
-				this.formatDate(filter.releasedAt),
-			);
+			params = params.set("releasedAt", filter.releasedAt);
 		}
 
 		if (filter.createdAt) {
-			params = params.set(
-				"createdAt",
-				this.formatDate(filter.createdAt),
-			);
+			params = params.set("createdAt", filter.createdAt);
 		}
 
 		if (filter.updatedAt) {
-			params = params.set(
-				"updatedAt",
-				this.formatDate(filter.updatedAt),
-			);
+			params = params.set("updatedAt", filter.updatedAt);
 		}
 
 		return params;
 	}
-
-	private formatDate(date: Date): string {
-		return date.toISOString().substring(0, 10);
-	}
-
-
-	
 
 	// Example of a request that does not exist in BaseService
 	// public exampleRequest(employeeId: Employee["id"], data: ExampleRequestDataDTO) {

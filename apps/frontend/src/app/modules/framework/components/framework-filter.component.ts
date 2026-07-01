@@ -68,29 +68,40 @@ import { ReadOneFrameworkType } from "@nx-nestjs-angular-starter/api/framework-t
 					</label>
 				}
 			</div>
-
-			<!-- Released -->
-
 			<div class="mb-6">
 				<label for="releasedAt" class="mb-2 block font-semibold"> Released At </label>
 
-				<input id="releasedAt" type="date" class="w-full rounded-md border border-slate-300 px-3 py-2" />
+				<input
+					id="releasedAt"
+					type="date"
+					class="w-full rounded-md border border-slate-300 px-3 py-2"
+					[ngModel]="releasedAt"
+					(ngModelChange)="onReleasedAtChange($event)"
+				/>
 			</div>
-
-			<!-- Created -->
 
 			<div class="mb-6">
 				<label for="createdAt" class="mb-2 block font-semibold"> Created At </label>
 
-				<input id="createdAt" type="date" class="w-full rounded-md border border-slate-300 px-3 py-2" />
+				<input
+					id="createdAt"
+					type="date"
+					class="w-full rounded-md border border-slate-300 px-3 py-2"
+					[ngModel]="createdAt"
+					(ngModelChange)="onCreatedAtChange($event)"
+				/>
 			</div>
-
-			<!-- Updated -->
 
 			<div>
 				<label for="updatedAt" class="mb-2 block font-semibold"> Updated At </label>
 
-				<input id="updatedAt" type="date" class="w-full rounded-md border border-slate-300 px-3 py-2" />
+				<input
+					id="updatedAt"
+					type="date"
+					class="w-full rounded-md border border-slate-300 px-3 py-2"
+					[ngModel]="updatedAt"
+					(ngModelChange)="onUpdatedAtChange($event)"
+				/>
 			</div>
 		</div>
 		<!-- <div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
@@ -148,6 +159,24 @@ export class FrameworkFilterComponent {
 	@Output()
 	codingLanguageChange = new EventEmitter<number[]>();
 
+	@Input()
+	releasedAt: string | null = null;
+
+	@Input()
+	createdAt: string | null = null;
+
+	@Input()
+	updatedAt: string | null = null;
+
+	@Output()
+	releasedAtChange = new EventEmitter<string | null>();
+
+	@Output()
+	createdAtChange = new EventEmitter<string | null>();
+
+	@Output()
+	updatedAtChange = new EventEmitter<string | null>();
+
 	onNameChange(value: string) {
 		this.nameChange.emit(value);
 	}
@@ -178,5 +207,17 @@ export class FrameworkFilterComponent {
 		}
 
 		this.codingLanguageChange.emit(ids);
+	}
+
+	onReleasedAtChange(value: string) {
+		this.releasedAtChange.emit(value || null);
+	}
+
+	onCreatedAtChange(value: string) {
+		this.createdAtChange.emit(value || null);
+	}
+
+	onUpdatedAtChange(value: string) {
+		this.updatedAtChange.emit(value || null);
 	}
 }

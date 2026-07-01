@@ -10,9 +10,9 @@ export interface FrameworkFilter {
 	frameworkTypeIds: number[];
 	codingLanguageIds: number[];
 
-	releasedAt: Date | null;
-	createdAt: Date | null;
-	updatedAt: Date | null;
+	releasedAt: string | null;
+	createdAt: string | null;
+	updatedAt: string | null;
 }
 
 export type SortOrder = "asc" | "desc";

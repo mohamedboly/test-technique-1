@@ -29,6 +29,12 @@ import { FrameworkFilterComponent } from "../components/framework-filter.compone
 					[codingLanguages]="(codingLanguages$ | async) ?? []"
 					[selectedCodingLanguageIds]="(codingLanguageIds$ | async) ?? []"
 					(codingLanguageChange)="onCodingLanguageChange($event)"
+					[releasedAt]="releasedAt$ | async"
+					[createdAt]="createdAt$ | async"
+					[updatedAt]="updatedAt$ | async"
+					(releasedAtChange)="onReleasedAtChange($event)"
+					(createdAtChange)="onCreatedAtChange($event)"
+					(updatedAtChange)="onUpdatedAtChange($event)"
 				/>
 			</div>
 
@@ -86,6 +92,12 @@ export class ListFrameworkPageComponent {
 		map(params => params.getAll("codingLanguageId").map(Number))
 	);
 
+	readonly releasedAt$ = this.route.queryParamMap.pipe(map(params => params.get("releasedAt")));
+
+	readonly createdAt$ = this.route.queryParamMap.pipe(map(params => params.get("createdAt")));
+
+	readonly updatedAt$ = this.route.queryParamMap.pipe(map(params => params.get("updatedAt")));
+
 	constructor(
 		private frameworkService: FrameworkService,
 		private codingLanguageService: CodingLanguageService,
@@ -137,6 +149,47 @@ export class ListFrameworkPageComponent {
 		});
 	}
 
+	onReleasedAtChange(date: string | null) {
+		this.router.navigate([], {
+			relativeTo: this.route,
+
+			queryParams: {
+				releasedAt: date,
+
+				page: 1,
+			},
+
+			queryParamsHandling: "merge",
+		});
+	}
+
+	onCreatedAtChange(date: string | null) {
+		this.router.navigate([], {
+			relativeTo: this.route,
+
+			queryParams: {
+				createdAt: date,
+
+				page: 1,
+			},
+
+			queryParamsHandling: "merge",
+		});
+	}
+	onUpdatedAtChange(date: string | null) {
+		this.router.navigate([], {
+			relativeTo: this.route,
+
+			queryParams: {
+				updatedAt: date,
+
+				page: 1,
+			},
+
+			queryParamsHandling: "merge",
+		});
+	}
+
 	private buildFrameworkFilter(query: ParamMap): FrameworkFilter {
 		return {
 			page: Number(query.get("page") ?? 1),
@@ -153,11 +206,11 @@ export class ListFrameworkPageComponent {
 
 			codingLanguageIds: query.getAll("codingLanguageId").map(Number),
 
-			releasedAt: query.get("releasedAt") ? new Date(query.get("releasedAt")!) : null,
+			releasedAt: query.get("releasedAt"),
 
-			createdAt: query.get("createdAt") ? new Date(query.get("createdAt")!) : null,
+			createdAt: query.get("createdAt"),
 
-			updatedAt: query.get("updatedAt") ? new Date(query.get("updatedAt")!) : null,
+			updatedAt: query.get("updatedAt"),
 		};
 	}
 }
