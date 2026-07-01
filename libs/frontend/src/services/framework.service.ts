@@ -4,6 +4,7 @@ import { CreateFrameworkDTO, ReadOneFramework, UpdateFrameworkDTO } from "@nx-ne
 import { BaseService } from "@nx-nestjs-angular-starter/connectit-shared-frontend";
 import { environment } from "../environments/environment";
 import { FrameworkFilter } from "../models/framework-filter";
+import { ReadAllFrameworkResponse } from "../models/readAll-framework-response ";
 
 @Injectable({
 	providedIn: "root",
