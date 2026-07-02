@@ -8,6 +8,7 @@ import {
 	TopbarService,
 } from "@nx-nestjs-angular-starter/frontend-shared";
 import { FrameworkFilter } from "libs/frontend/src/models/framework-filter";
+import { PaginatorModule, PaginatorState } from "primeng/paginator";
 import { map, switchMap, tap } from "rxjs";
 import { FrameworkCardComponent } from "../components/framework-card.component";
 import { FrameworkFilterComponent } from "../components/framework-filter.component";
@@ -15,7 +16,7 @@ import { FrameworkFilterComponent } from "../components/framework-filter.compone
 @Component({
 	selector: "app-list-framework-page",
 	standalone: true,
-	imports: [CommonModule, FrameworkCardComponent, FrameworkFilterComponent],
+	imports: [CommonModule, FrameworkCardComponent, FrameworkFilterComponent, PaginatorModule],
 	template: `
 		<div class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
 			<!-- Colonne gauche -->
@@ -56,6 +57,15 @@ import { FrameworkFilterComponent } from "../components/framework-filter.compone
 							}
 						</div>
 					}
+					<div class="mb-4">
+						<p-paginator
+							[rows]="response.pageSize"
+							[totalRecords]="response.total"
+							[first]="(response.page - 1) * response.pageSize"
+							[rowsPerPageOptions]="[12, 24, 48]"
+							(onPageChange)="onPageChange($event)"
+						/>
+					</div>
 				</ng-container>
 			</div>
 			<div></div>
@@ -184,6 +194,20 @@ export class ListFrameworkPageComponent {
 				updatedAt: date,
 
 				page: 1,
+			},
+
+			queryParamsHandling: "merge",
+		});
+	}
+
+	onPageChange(event: PaginatorState) {
+		this.router.navigate([], {
+			relativeTo: this.route,
+
+			queryParams: {
+				page: (event.page ?? 0) + 1,
+
+				pageSize: event.rows,
 			},
 
 			queryParamsHandling: "merge",
