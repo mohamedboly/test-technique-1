@@ -18,6 +18,13 @@ import { FrameworkFilterComponent } from "../components/framework-filter.compone
 	standalone: true,
 	imports: [CommonModule, FrameworkCardComponent, FrameworkFilterComponent, PaginatorModule],
 	template: `
+		<button
+			type="button"
+			class="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+			(click)="newFramework()"
+		>
+			+ New framework
+		</button>
 		<div class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
 			<!-- Colonne gauche -->
 			<div>
@@ -212,6 +219,10 @@ export class ListFrameworkPageComponent {
 
 			queryParamsHandling: "merge",
 		});
+	}
+
+	newFramework() {
+		this.router.navigate(["/app/frameworks/new"]);
 	}
 
 	private buildFrameworkFilter(query: ParamMap): FrameworkFilter {
