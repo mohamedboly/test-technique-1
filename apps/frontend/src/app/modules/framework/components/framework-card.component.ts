@@ -1,5 +1,6 @@
 import { CommonModule, DatePipe } from "@angular/common";
 import { Component, Input } from "@angular/core";
+import { Router } from "@angular/router";
 import { ReadOneFramework } from "@nx-nestjs-angular-starter/api/framework";
 
 @Component({
@@ -42,6 +43,13 @@ import { ReadOneFramework } from "@nx-nestjs-angular-starter/api/framework";
 				</div>
 
 				<p class="mt-auto text-xs text-slate-400">Sorti le {{ framework.releasedAt | date: "dd/MM/yyyy" }}</p>
+				<button
+					type="button"
+					class="rounded bg-slate-700 px-3 py-1 text-sm text-white hover:bg-slate-800"
+					(click)="editFramework()"
+				>
+					Modifier
+				</button>
 			</div>
 		</div>
 	`,
@@ -49,7 +57,13 @@ import { ReadOneFramework } from "@nx-nestjs-angular-starter/api/framework";
 export class FrameworkCardComponent {
 	@Input({ required: true }) framework!: ReadOneFramework;
 
+	constructor(private router: Router) {}
+
 	onImgError(event: Event) {
 		(event.target as HTMLImageElement).style.display = "none";
+	}
+
+	editFramework() {
+		this.router.navigate(["/app/frameworks", this.framework.id, "edit"]);
 	}
 }
