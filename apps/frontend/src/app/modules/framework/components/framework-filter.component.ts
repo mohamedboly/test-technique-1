@@ -12,10 +12,6 @@ import { ReadOneFrameworkType } from "@nx-nestjs-angular-starter/api/framework-t
 		<div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
 			<div class="mb-6 flex items-center justify-between border-b pb-3">
 				<h2 class="text-lg font-semibold">Filters</h2>
-
-				<!-- <button type="button" class="text-sm text-blue-600 hover:underline" (click)="clearFilters()">
-					Clear
-				</button> -->
 			</div>
 
 			<!-- Name -->
@@ -104,34 +100,6 @@ import { ReadOneFrameworkType } from "@nx-nestjs-angular-starter/api/framework-t
 				/>
 			</div>
 		</div>
-		<!-- <div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-			<label class="mb-2 block text-sm font-medium text-slate-700"> Name </label>
-
-			<input
-				type="text"
-				class="w-full rounded-md border border-slate-300 px-3 py-2"
-				[ngModel]="name"
-				(ngModelChange)="onNameChange($event)"
-				placeholder="Rechercher..."
-			/>
-			<div class="mt-6">
-				<h3 class="mb-3 text-sm font-semibold">Framework Type</h3>
-
-				@for (type of frameworkTypes; track type.id) {
-					<div class="mb-2 flex items-center gap-2">
-						<input
-							type="checkbox"
-							[checked]="selectedFrameworkTypeIds.includes(type.id)"
-							(change)="onFrameworkTypeChecked(type.id, $any($event.target).checked)"
-						/>
-
-						<span>
-							{{ type.name }}
-						</span>
-					</div>
-				}
-			</div>
-		</div> -->
 	`,
 })
 export class FrameworkFilterComponent {

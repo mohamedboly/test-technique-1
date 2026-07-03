@@ -2,9 +2,6 @@ export interface FrameworkFilter {
 	page: number;
 	pageSize: number;
 
-	sort: SortField;
-	order: SortOrder;
-
 	name: string | null;
 
 	frameworkTypeIds: number[];

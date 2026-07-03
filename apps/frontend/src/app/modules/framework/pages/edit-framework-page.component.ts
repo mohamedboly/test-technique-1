@@ -27,10 +27,10 @@ export class EditFrameworkPageComponent {
 	);
 
 	constructor(
-		private frameworkService: FrameworkService,
-		private route: ActivatedRoute,
-		private router: Router,
-		private topbarService: TopbarService
+		private readonly frameworkService: FrameworkService,
+		private readonly route: ActivatedRoute,
+		private readonly router: Router,
+		private readonly topbarService: TopbarService
 	) {
 		this.topbarService.setHeader("Edit framework");
 	}

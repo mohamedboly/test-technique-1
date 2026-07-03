@@ -9,7 +9,7 @@ import {
 } from "@nx-nestjs-angular-starter/frontend-shared";
 import { FrameworkFilter } from "libs/frontend/src/models/framework-filter";
 import { PaginatorModule, PaginatorState } from "primeng/paginator";
-import { map, switchMap, tap } from "rxjs";
+import { debounceTime, map, switchMap, tap } from "rxjs";
 import { FrameworkCardComponent } from "../components/framework-card.component";
 import { FrameworkFilterComponent } from "../components/framework-filter.component";
 
@@ -80,11 +80,6 @@ import { FrameworkFilterComponent } from "../components/framework-filter.compone
 	`,
 })
 export class ListFrameworkPageComponent {
-	// frameworks$ = this.frameworkService.readAll().pipe(
-	// 	tap(() => (this.loading = false)),
-	// );
-	// loading = true;
-
 	frameworkTypes$ = this.frameworkTypeService.readAll();
 
 	codingLanguages$ = this.codingLanguageService.readAll();
@@ -92,9 +87,14 @@ export class ListFrameworkPageComponent {
 	queryParams$ = this.route.queryParamMap;
 
 	frameworks$ = this.queryParams$.pipe(
-		map(query => this.buildFrameworkFilter(query)),
+		debounceTime(300),
+		map(query => {
+			return this.buildFrameworkFilter(query);
+		}),
 
-		switchMap(filter => this.frameworkService.readPage(filter)),
+		switchMap(filter => {
+			return this.frameworkService.readPage(filter);
+		}),
 
 		tap(() => (this.loading = false))
 	);
@@ -230,10 +230,6 @@ export class ListFrameworkPageComponent {
 			page: Number(query.get("page") ?? 1),
 
 			pageSize: Number(query.get("pageSize") ?? 12),
-
-			sort: (query.get("sort") as FrameworkFilter["sort"]) ?? "name",
-
-			order: query.get("order") === "desc" ? "desc" : "asc",
 
 			name: query.get("name"),
 

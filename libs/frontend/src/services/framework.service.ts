@@ -23,11 +23,9 @@ export class FrameworkService extends BaseService<ReadOneFramework, CreateFramew
 	}
 
 	private buildHttpParams(filter: FrameworkFilter): HttpParams {
-		let params = new HttpParams()
-			.set("page", filter.page)
-			.set("pageSize", filter.pageSize)
-			.set("sort", filter.sort)
-			.set("order", filter.order);
+		let params = new HttpParams().set("page", filter.page).set("pageSize", filter.pageSize);
+		// .set("sort", filter.sort)
+		// .set("order", filter.order);
 
 		if (filter.name) {
 			params = params.set("name", filter.name);

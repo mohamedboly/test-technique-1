@@ -50,13 +50,11 @@ export class ApiFrameworkService {
 
 		const where = this.buildWhere(filter);
 
-		const orderBy = this.buildOrderBy(filter);
-
 		const [frameworks, total] = await Promise.all([
 			this.prismaService.framework.findMany({
 				where,
 				include,
-				orderBy,
+
 				skip,
 				take,
 			}),
@@ -115,36 +113,6 @@ export class ApiFrameworkService {
 		};
 	}
 
-	private buildOrderBy(filter: FrameworkFilter): Prisma.FrameworkOrderByWithRelationInput {
-		return {
-			[filter.sort]: filter.order,
-		};
-	}
-
-	private frameworkFilter(query: Record<string, string | string[] | undefined>): FrameworkFilter {
-		return {
-			page: this.pageFilter(query),
-
-			pageSize: this.pageSizeFilter(query),
-
-			sort: this.sortFilter(query),
-
-			order: this.orderFilter(query),
-
-			name: this.nameFilter(query),
-
-			frameworkTypeIds: this.frameworkTypeFilter(query),
-
-			codingLanguageIds: this.codingLanguageFilter(query),
-
-			releasedAt: this.releasedAtFilter(query),
-
-			createdAt: this.createdAtFilter(query),
-
-			updatedAt: this.updatedAtFilter(query),
-		};
-	}
-
 	private buildWhere(filter: FrameworkFilter): Prisma.FrameworkWhereInput {
 		const where: Prisma.FrameworkWhereInput = {
 			deletedAt: null,
@@ -179,8 +147,6 @@ export class ApiFrameworkService {
 		if (filter.updatedAt) {
 			where.updatedAt = filter.updatedAt;
 		}
-
-		console.log(where);
 
 		return where;
 	}
@@ -298,10 +264,6 @@ export class ApiFrameworkService {
 
 			pageSize,
 
-			sort: this.sortFilter(query),
-
-			order: this.orderFilter(query),
-
 			name: this.nameFilter(query),
 
 			frameworkTypeIds: this.frameworkTypeFilter(query),
@@ -321,10 +283,6 @@ interface FrameworkFilter {
 	page: number;
 
 	pageSize: number;
-
-	sort: Prisma.FrameworkScalarFieldEnum;
-
-	order: Prisma.SortOrder;
 
 	name: string | null;
 
