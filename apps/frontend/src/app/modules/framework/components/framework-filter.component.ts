@@ -39,7 +39,7 @@ import { ReadOneFrameworkType } from "@nx-nestjs-angular-starter/api/framework-t
 						<input
 							type="checkbox"
 							[checked]="selectedFrameworkTypeIds.includes(type.id)"
-							(change)="onFrameworkTypeChecked(type.id, $any($event.target).checked)"
+							(change)="onFrameworkTypeChecked(type.id, $event)"
 						/>
 
 						<span>{{ type.name }}</span>
@@ -57,7 +57,7 @@ import { ReadOneFrameworkType } from "@nx-nestjs-angular-starter/api/framework-t
 						<input
 							type="checkbox"
 							[checked]="selectedCodingLanguageIds.includes(language.id)"
-							(change)="onCodingLanguageChecked(language.id, $any($event.target).checked)"
+							(change)="onCodingLanguageChecked(language.id, $event)"
 						/>
 
 						<span>{{ language.name }}</span>
@@ -149,7 +149,9 @@ export class FrameworkFilterComponent {
 		this.nameChange.emit(value);
 	}
 
-	onFrameworkTypeChecked(id: number, checked: boolean) {
+	onFrameworkTypeChecked(id: number, event: Event) {
+		const checked = (event.target as HTMLInputElement).checked;
+
 		let ids = [...this.selectedFrameworkTypeIds];
 
 		if (checked) {
@@ -163,7 +165,9 @@ export class FrameworkFilterComponent {
 		this.frameworkTypeChange.emit(ids);
 	}
 
-	onCodingLanguageChecked(id: number, checked: boolean) {
+	onCodingLanguageChecked(id: number, event: Event) {
+		const checked = (event.target as HTMLInputElement).checked;
+
 		let ids = [...this.selectedCodingLanguageIds];
 
 		if (checked) {
