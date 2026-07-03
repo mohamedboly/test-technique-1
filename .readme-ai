@@ -1,0 +1,81 @@
+# .readme-ai
+
+# Utilisation de l'intelligence artificielle
+
+## Outils utilisés
+
+- ChatGPT (OpenAI)
+
+## Intégration dans mon flux de travail
+
+J'ai utilisé ChatGPT comme assistant de développement tout au long de l'exercice.
+
+L'outil n'a pas été utilisé pour générer une solution complète dès le départ. Mon approche a consisté à développer progressivement chaque fonctionnalité puis à utiliser ChatGPT principalement pour :
+
+- discuter de l'architecture à adopter ;
+- valider certaines décisions techniques ;
+- générer du code à partir d'une conception déjà définie ;
+- expliquer certains comportements d'Angular, NestJS, Prisma et RxJS ;
+- identifier des causes possibles lors du débogage.
+
+Chaque proposition était relue, adaptée puis intégrée manuellement au projet.
+
+---
+
+## Méthodologie
+
+Les échanges se sont faits de manière itérative.
+
+Pour chaque fonctionnalité, j'ai d'abord défini la manière dont je souhaitais l'implémenter puis j'ai demandé à ChatGPT de produire du code en respectant ces contraintes.
+
+Mes directives étaient notamment :
+
+- conserver l'architecture existante ;
+- éviter les refactorisations inutiles ;
+- privilégier des composants réutilisables ;
+- utiliser uniquement du HTML natif lorsque demandé (sans composants PrimeNG pour les formulaires) ;
+- respecter les conventions déjà présentes dans le projet ;
+- conserver la logique métier côté backend ;
+- produire un code simple, lisible et cohérent avec le reste de l'application.
+
+Lorsque les propositions ne correspondaient pas à ma conception, elles étaient corrigées ou réécrites jusqu'à obtenir le résultat souhaité.
+
+---
+
+## Exemples de prompts
+
+Quelques exemples des demandes effectuées :
+
+- implémenter la pagination côté frontend en conservant l'API existante ;
+- construire les filtres à partir des query parameters ;
+- partager le même composant entre la création et la modification d'un framework ;
+- alimenter les listes déroulantes depuis l'API ;
+- respecter l'architecture existante sans refactorisation ;
+- expliquer certains comportements Angular et RxJS ;
+- analyser les causes possibles d'un dysfonctionnement lors du filtrage après navigation.
+
+---
+
+## Répartition du travail
+
+### Réalisé par moi
+
+- conception de l'architecture générale ;
+- choix de la structure des composants ;
+- définition des modèles de données ;
+- conception des filtres et des paramètres de recherche ;
+- conception de la navigation entre les pages ;
+- choix des interactions avec l'API ;
+- intégration des différentes fonctionnalités ;
+- validation et adaptation de chaque proposition ;
+- débogage, tests et corrections.
+
+### Assistance de ChatGPT
+
+- génération de portions de code à partir de mes spécifications ;
+- aide sur certaines implémentations Angular, RxJS et NestJS ;
+- explications techniques ;
+- revue de code ;
+- propositions d'amélioration et pistes de débogage.
+
+Toutes les propositions générées ont été relues, adaptées et validées avant leur intégration.
